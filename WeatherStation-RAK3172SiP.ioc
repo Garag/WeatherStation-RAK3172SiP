@@ -1,7 +1,6 @@
 #MicroXplorer Configuration settings - do not modify
 ADC.Calibration=Disable
-ADC.Channel-IN-Vbat=ADC_CHANNEL_VBAT
-ADC.Channel-IN-Vrefint=ADC_CHANNEL_VREFINT
+ADC.Channel-IN=ADC_CHANNEL_VBAT
 ADC.ClockPrescaler=ADC_CLOCK_SYNC_PCLK_DIV2
 ADC.ContinuousConvMode=DISABLE
 ADC.DMAContinuousRequests=DISABLE
@@ -11,7 +10,7 @@ ADC.EOCSelection=ADC_EOC_SINGLE_CONV
 ADC.EnableRegularConversion=DISABLE
 ADC.ExternalTrigConv=ADC_SOFTWARE_START
 ADC.ExternalTrigConvEdge=ADC_EXTERNALTRIGCONVEDGE_NONE
-ADC.IPParameters=Channel-IN-Vrefint,Channel-IN-Vbat,ClockPrescaler,Resolution,Calibration,DataAlign,ScanConvMode,EOCSelection,LowPowerAutoWait,LowPowerAutoPowerOff,ContinuousConvMode,DiscontinuousConvMode,ExternalTrigConv,ExternalTrigConvEdge,DMAContinuousRequests,Overrun,Sequencer,SamplingTimeCommon1,SamplingTimeCommon2,OversamplingMode,TriggerFrequencyMode,EnableRegularConversion,NbrOfConversion,SelectedChannel
+ADC.IPParameters=Channel-IN,ClockPrescaler,Resolution,Calibration,DataAlign,ScanConvMode,EOCSelection,LowPowerAutoWait,LowPowerAutoPowerOff,ContinuousConvMode,DiscontinuousConvMode,ExternalTrigConv,ExternalTrigConvEdge,DMAContinuousRequests,Overrun,Sequencer,SamplingTimeCommon1,SamplingTimeCommon2,OversamplingMode,TriggerFrequencyMode,EnableRegularConversion,NbrOfConversion,SelectedChannel
 ADC.LowPowerAutoPowerOff=DISABLE
 ADC.LowPowerAutoWait=DISABLE
 ADC.NbrOfConversion=1
