@@ -28,7 +28,7 @@ extern "C" {
 /* Includes ------------------------------------------------------------------*/
 
 /* USER CODE BEGIN Includes */
-
+#if 0
 /* USER CODE END Includes */
 
 /* Exported types ------------------------------------------------------------*/
@@ -51,16 +51,20 @@ typedef struct
 } sensor_t;
 
 /* USER CODE BEGIN ET */
+#endif
+
+typedef struct
+{
+	float temperature; /*!< in degC */
+	float humidity;    /*!< in % */
+	float pressure;
+} sensor_t;
 
 /* USER CODE END ET */
 
 /* Exported constants --------------------------------------------------------*/
 
 /* USER CODE BEGIN EC */
-#if defined (SENSOR_ENABLED) && (SENSOR_ENABLED == 1) && defined (X_NUCLEO_IKS01A2)
-#define HTS221_0    0U
-#define LPS22HB_0   1U
-#endif /* SENSOR_ENABLED & X_NUCLEO_IKS01A2 */
 /* USER CODE END EC */
 
 /* External variables --------------------------------------------------------*/

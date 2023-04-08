@@ -53,7 +53,12 @@ extern "C" {
 #define VDD_MIN                     1800
 
 /* USER CODE BEGIN EC */
+#undef VDD_BAT
+#undef VDD_MIN
 
+// Use LiFePO battery values
+#define VDD_BAT                     ((uint32_t) 3600)
+#define VDD_MIN                     ((uint32_t) 2500)
 /* USER CODE END EC */
 
 /* External variables --------------------------------------------------------*/

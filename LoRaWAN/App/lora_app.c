@@ -290,6 +290,8 @@ static UTIL_TIMER_Time_t TxPeriodicity = APP_TX_DUTYCYCLE;
 static UTIL_TIMER_Object_t StopJoinTimer;
 
 /* USER CODE BEGIN PV */
+static uint8_t AppDataBuffer[LORAWAN_APP_DATA_BUFFER_MAX_SIZE];
+static LmHandlerAppData_t AppData = { 0, 0, AppDataBuffer };
 /* USER CODE END PV */
 
 /* Exported functions ---------------------------------------------------------*/
@@ -388,7 +390,35 @@ static void OnRxData(LmHandlerAppData_t *appData, LmHandlerRxParams_t *params)
 static void SendTxData(void)
 {
   /* USER CODE BEGIN SendTxData_1 */
+	sensor_t sensor_data;
+    uint16_t battery_mv = SYS_GetBatteryLevel();
 
+    int16_t temperature = 0;
+    uint16_t humidity = 0;
+    uint32_t i = 0;
+
+	EnvSensors_Read(&sensor_data);
+
+	humidity    = (uint16_t)(sensor_data.humidity * 10);            /* in %*10     */
+	temperature = (int16_t)(sensor_data.temperature * 10);
+
+	APP_LOG(TS_ON, VLEVEL_M, "VDDA: %d\r\n", battery_mv);
+	APP_LOG(TS_ON, VLEVEL_M, "temp: %d\r\n", temperature);
+	APP_LOG(TS_ON, VLEVEL_M, "humi: %d\r\n", humidity);
+
+	AppData.Port = LORAWAN_USER_APP_PORT;
+	AppData.Buffer[i++] = (uint8_t)((battery_mv >> 8) & 0xFF);
+	AppData.Buffer[i++] = (uint8_t)(battery_mv & 0xFF);
+	AppData.Buffer[i++] = (uint8_t)((temperature >> 8) & 0xFF);
+	AppData.Buffer[i++] = (uint8_t)(temperature & 0xFF);
+	AppData.Buffer[i++] = (uint8_t)((humidity >> 8) & 0xFF);
+	AppData.Buffer[i++] = (uint8_t)(humidity & 0xFF);
+
+	AppData.BufferSize = i;
+	if (LORAMAC_HANDLER_SUCCESS == LmHandlerSend(&AppData, LORAWAN_DEFAULT_CONFIRMED_MSG_STATE, false))
+	{
+	    APP_LOG(TS_ON, VLEVEL_L, "SEND REQUEST\r\n");
+	}
   /* USER CODE END SendTxData_1 */
 }
 
