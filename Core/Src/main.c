@@ -20,6 +20,7 @@
 #include "main.h"
 #include "i2c.h"
 #include "app_lorawan.h"
+#include "lptim.h"
 #include "usart.h"
 #include "gpio.h"
 
@@ -91,8 +92,10 @@ int main(void)
   MX_USART1_UART_Init();
   MX_I2C2_Init();
   MX_LoRaWAN_Init();
+  MX_LPTIM1_Init();
+  MX_LPTIM2_Init();
   /* USER CODE BEGIN 2 */
-  CoWorker_Init();
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -127,10 +130,12 @@ void SystemClock_Config(void)
 
   /** Initializes the CPU, AHB and APB buses clocks
   */
-  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_LSI|RCC_OSCILLATORTYPE_LSE
-                              |RCC_OSCILLATORTYPE_MSI;
+  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI|RCC_OSCILLATORTYPE_LSI
+                              |RCC_OSCILLATORTYPE_LSE|RCC_OSCILLATORTYPE_MSI;
   RCC_OscInitStruct.LSEState = RCC_LSE_ON;
+  RCC_OscInitStruct.HSIState = RCC_HSI_ON;
   RCC_OscInitStruct.MSIState = RCC_MSI_ON;
+  RCC_OscInitStruct.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
   RCC_OscInitStruct.MSICalibrationValue = RCC_MSICALIBRATION_DEFAULT;
   RCC_OscInitStruct.MSIClockRange = RCC_MSIRANGE_11;
   RCC_OscInitStruct.LSIDiv = RCC_LSI_DIV1;

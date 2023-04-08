@@ -24,7 +24,6 @@ const uint8_t BOOT_CMD_READ[] = { 0x11, 0xEE };
 const uint8_t BOOT_CMD_WRITE[] = { 0x31, 0xCE };
 
 const uint8_t FLASH_START_ADR_WITH_CSUM[] = { 0x08, 0x00, 0x00, 0x00, 0x08 };
-const uint8_t EXT_ERASE_CHIP[] = { 0x00, 0xFF, 0xFF };
 
 
 static HAL_StatusTypeDef CoWorker_Flash_Firmware(const uint8_t *pFirmware, uint32_t len);
