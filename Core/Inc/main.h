@@ -29,6 +29,18 @@ extern "C" {
 /* Includes ------------------------------------------------------------------*/
 #include "stm32wlxx_hal.h"
 
+#include "stm32wlxx_ll_lptim.h"
+#include "stm32wlxx_ll_bus.h"
+#include "stm32wlxx_ll_cortex.h"
+#include "stm32wlxx_ll_rcc.h"
+#include "stm32wlxx_ll_system.h"
+#include "stm32wlxx_ll_utils.h"
+#include "stm32wlxx_ll_pwr.h"
+#include "stm32wlxx_ll_gpio.h"
+#include "stm32wlxx_ll_dma.h"
+
+#include "stm32wlxx_ll_exti.h"
+
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 

@@ -30,6 +30,7 @@
 /* USER CODE BEGIN Includes */
 #include "sys_app.h"
 #include "i2c.h"
+#include "lptim.h"
 #include "bme68x.h"
 /* USER CODE END Includes */
 
@@ -63,6 +64,9 @@ const uint16_t sht3x_addr_h = 0x45;
 
 static struct bme68x_dev bme;
 static uint8_t dev_addr;
+
+static uint32_t rainCounterLastValue = 0;
+static uint32_t windCounterLastValue = 0;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -87,8 +91,12 @@ int32_t EnvSensors_Read(sensor_t *sensor_data)
 	sensor_data->temperature = -45.0;
 	sensor_data->pressure    = 0.0;
 
-//	MX_I2C2_Init();
-//    HAL_Delay(1);
+    uint32_t rainValue = LL_LPTIM_GetCounter(LPTIM1);
+    uint32_t windValue = LL_LPTIM_GetCounter(LPTIM2);
+    sensor_data->rainCounter = rainValue - rainCounterLastValue;
+    sensor_data->windCounter = windValue - windCounterLastValue;
+    rainCounterLastValue = rainValue;
+    windCounterLastValue = windValue;
 
 	uint8_t rslt = bme68x_init(&bme);
 

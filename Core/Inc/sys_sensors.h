@@ -57,7 +57,9 @@ typedef struct
 {
 	float temperature; /*!< in degC */
 	float humidity;    /*!< in % */
-	float pressure;
+	float pressure;    /*!< in pascal */
+	uint32_t rainCounter;
+    uint32_t windCounter;
 } sensor_t;
 
 /* USER CODE END ET */

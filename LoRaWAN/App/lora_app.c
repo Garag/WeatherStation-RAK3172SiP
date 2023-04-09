@@ -405,6 +405,8 @@ static void SendTxData(void)
 	APP_LOG(TS_ON, VLEVEL_M, "VDDA: %d\r\n", battery_mv);
 	APP_LOG(TS_ON, VLEVEL_M, "temp: %d\r\n", temperature);
 	APP_LOG(TS_ON, VLEVEL_M, "humi: %d\r\n", humidity);
+    APP_LOG(TS_ON, VLEVEL_M, "rain cnt: %d\r\n", sensor_data.rainCounter);
+    APP_LOG(TS_ON, VLEVEL_M, "wind cnt: %d\r\n", sensor_data.windCounter);
 
 	AppData.Port = LORAWAN_USER_APP_PORT;
 	AppData.Buffer[i++] = (uint8_t)((battery_mv >> 8) & 0xFF);
