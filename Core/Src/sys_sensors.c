@@ -62,8 +62,10 @@ const uint8_t cmd_read_status[] = { 0xf3, 0x2d };
 const uint16_t sht3x_addr_l = 0x44;
 const uint16_t sht3x_addr_h = 0x45;
 
+#ifdef USE_BME680
 static struct bme68x_dev bme;
 static uint8_t dev_addr;
+#endif
 
 static uint32_t rainCounterLastValue = 0;
 static uint32_t windCounterLastValue = 0;
@@ -71,9 +73,14 @@ static uint32_t windCounterLastValue = 0;
 
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN PFP */
-static BME68X_INTF_RET_TYPE bme68x_read(uint8_t reg_addr, uint8_t *reg_data, uint32_t length, void *intf_ptr);
-static BME68X_INTF_RET_TYPE bme68x_write(uint8_t reg_addr, const uint8_t *reg_data, uint32_t length, void *intf_ptr);
-static void bme68x_delay_us(uint32_t period, void *intf_ptr);
+
+#ifdef USE_BME680
+    static BME68X_INTF_RET_TYPE bme68x_read(uint8_t reg_addr, uint8_t *reg_data, uint32_t length, void *intf_ptr);
+    static BME68X_INTF_RET_TYPE bme68x_write(uint8_t reg_addr, const uint8_t *reg_data, uint32_t length, void *intf_ptr);
+    static void bme68x_delay_us(uint32_t period, void *intf_ptr);
+#else
+    static uint8_t sht3x_calc_crc(const uint8_t *data, size_t length);
+#endif
 /* USER CODE END PFP */
 
 /* Exported functions --------------------------------------------------------*/
@@ -81,10 +88,8 @@ int32_t EnvSensors_Read(sensor_t *sensor_data)
 {
   /* USER CODE BEGIN EnvSensors_Read */
 	HAL_StatusTypeDef ret = HAL_OK;
-    struct bme68x_conf conf;
-//    struct bme68x_heatr_conf heatr_conf;
-    struct bme68x_data data;
-    uint8_t n_fields;
+
+    MX_I2C2_Init();
 
 	// set default values
 	sensor_data->humidity    = 0.0;
@@ -97,6 +102,12 @@ int32_t EnvSensors_Read(sensor_t *sensor_data)
     sensor_data->windCounter = windValue - windCounterLastValue;
     rainCounterLastValue = rainValue;
     windCounterLastValue = windValue;
+
+#ifdef USE_BME680
+    struct bme68x_conf conf;
+//    struct bme68x_heatr_conf heatr_conf;
+    struct bme68x_data data;
+    uint8_t n_fields;
 
 	uint8_t rslt = bme68x_init(&bme);
 
@@ -115,6 +126,28 @@ int32_t EnvSensors_Read(sensor_t *sensor_data)
     	sensor_data->temperature = data.temperature;
     	sensor_data->pressure    = data.pressure;
     }
+#else
+    uint8_t buffer[6];
+    ret = HAL_I2C_Master_Transmit(&hi2c2, sht3x_addr_l << 1, (uint8_t *)cmd_single_high_stretch, sizeof(cmd_single_high_stretch), 30);
+    if (ret != HAL_OK) return ret;
+
+    HAL_Delay(1);
+    ret = HAL_I2C_Master_Receive(&hi2c2, sht3x_addr_l << 1, buffer, sizeof(buffer), 30);
+    if (ret != HAL_OK) return ret;
+
+    uint8_t temp_crc = sht3x_calc_crc(buffer, 2);
+    uint8_t hum_crc = sht3x_calc_crc(buffer + 3, 2);
+    if (temp_crc != buffer[2] || hum_crc != buffer[5]) {
+        return HAL_ERROR;
+    }
+    else {
+        int16_t temp_raw = (int16_t)buffer[0] << 8 | (uint16_t)buffer[1];
+        uint16_t hum_raw = (int16_t)buffer[3] << 8 | (uint16_t)buffer[4];
+
+        sensor_data->temperature = -45.0f + 175.0f * (float)temp_raw / 65535.0f;
+        sensor_data->humidity = 100.0f * (float)hum_raw / 65535.0f;
+    }
+#endif
 	return ret;
   /* USER CODE END EnvSensors_Read */
 }
@@ -125,6 +158,7 @@ int32_t EnvSensors_Init(void)
   /* USER CODE BEGIN EnvSensors_Init */
   MX_I2C2_Init();
 
+#ifdef USE_BME680
   dev_addr = (BME68X_I2C_ADDR_HIGH) << 1;
   bme.intf_ptr = &dev_addr;
   bme.read = bme68x_read;
@@ -132,6 +166,9 @@ int32_t EnvSensors_Init(void)
   bme.intf = BME68X_I2C_INTF;
   bme.delay_us = bme68x_delay_us;
   bme.amb_temp = 23;
+#else
+
+#endif
 
   /* USER CODE END EnvSensors_Init */
   return ret;
@@ -144,6 +181,7 @@ int32_t EnvSensors_Init(void)
 /* Private Functions Definition -----------------------------------------------*/
 /* USER CODE BEGIN PrFD */
 
+#ifdef USE_BME680
 static BME68X_INTF_RET_TYPE bme68x_read(uint8_t reg_addr, uint8_t *reg_data, uint32_t length, void *intf_ptr)
 {
 	HAL_StatusTypeDef ret;
@@ -171,5 +209,24 @@ static void bme68x_delay_us(uint32_t period, void *intf_ptr)
 	uint32_t delay_ms = (period + 999) / 1000;
 	HAL_Delay(delay_ms);
 }
+
+#else  // USE_BME680
+
+static uint8_t sht3x_calc_crc(const uint8_t *data, size_t length)
+{
+    uint8_t crc = 0xff;
+    for (size_t i = 0; i < length; i++) {
+        crc ^= data[i];
+        for (size_t j = 0; j < 8; j++) {
+            if ((crc & 0x80u) != 0) {
+                crc = (uint8_t)((uint8_t)(crc << 1u) ^ 0x31u);
+            } else {
+                crc <<= 1u;
+            }
+        }
+    }
+    return crc;
+}
+#endif
 
 /* USER CODE END PrFD */
