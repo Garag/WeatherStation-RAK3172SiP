@@ -393,14 +393,10 @@ static void SendTxData(void)
 	sensor_t sensor_data;
     uint16_t battery_mv = SYS_GetBatteryLevel();
 
-    int16_t temperature = 0;
-    uint16_t humidity = 0;
-    uint32_t i = 0;
-
 	EnvSensors_Read(&sensor_data);
 
-	humidity    = (uint16_t)(sensor_data.humidity * 10);            /* in %*10     */
-	temperature = (int16_t)(sensor_data.temperature * 10);
+    uint16_t humidity    = (uint16_t)(sensor_data.humidity * 10);            /* in %*10     */
+    int16_t temperature = (int16_t)(sensor_data.temperature * 10);
 
 	APP_LOG(TS_ON, VLEVEL_M, "VDDA: %d\r\n", battery_mv);
 	APP_LOG(TS_ON, VLEVEL_M, "temp: %d\r\n", temperature);
@@ -408,6 +404,7 @@ static void SendTxData(void)
     APP_LOG(TS_ON, VLEVEL_M, "rain cnt: %d\r\n", sensor_data.rainCounter);
     APP_LOG(TS_ON, VLEVEL_M, "wind cnt: %d\r\n", sensor_data.windCounter);
 
+    uint32_t i = 0;
 	AppData.Port = LORAWAN_USER_APP_PORT;
 	AppData.Buffer[i++] = (uint8_t)((battery_mv >> 8) & 0xFF);
 	AppData.Buffer[i++] = (uint8_t)(battery_mv & 0xFF);
@@ -451,6 +448,11 @@ static void OnTxData(LmHandlerTxParams_t *params)
 static void OnJoinRequest(LmHandlerJoinParams_t *joinParams)
 {
   /* USER CODE BEGIN OnJoinRequest_1 */
+    APP_LOG(TS_ON, VLEVEL_M, "OnJoinRequest: Status=%d\r\n", joinParams->Status);
+    if (joinParams->Status == LORAMAC_HANDLER_SUCCESS) {
+        APP_LOG(TS_ON, VLEVEL_M, "#### SUCCESSFULL JOINED ####\r\n");
+        LmHandlerDeviceTimeReq();
+    }
   /* USER CODE END OnJoinRequest_1 */
 }
 
@@ -463,7 +465,7 @@ static void OnBeaconStatusChange(LmHandlerBeaconParams_t *params)
 static void OnSysTimeUpdate(void)
 {
   /* USER CODE BEGIN OnSysTimeUpdate_1 */
-
+    APP_LOG(TS_ON, VLEVEL_M, "#### OnSysTimeUpdate() called! ####\r\n");
   /* USER CODE END OnSysTimeUpdate_1 */
 }
 

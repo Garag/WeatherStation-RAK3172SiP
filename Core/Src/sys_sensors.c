@@ -89,7 +89,7 @@ int32_t EnvSensors_Read(sensor_t *sensor_data)
   /* USER CODE BEGIN EnvSensors_Read */
 	HAL_StatusTypeDef ret = HAL_OK;
 
-    MX_I2C2_Init();
+//    MX_I2C2_Init();
 
 	// set default values
 	sensor_data->humidity    = 0.0;
